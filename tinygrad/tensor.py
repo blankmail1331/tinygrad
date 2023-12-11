@@ -181,6 +181,16 @@ class Tensor:
     return Tensor.full((math.ceil((stop-start)/step),), step, **kwargs).cumsum() + (start - step)
 
   @staticmethod
+  def linspace(start: Union[int, float], stop: Union[int, float], steps: int, **kwargs):
+    assert steps > -1, "number of steps must be non-negative"
+    if steps == 0:
+      return Tensor([], **kwargs)
+    if steps == 1:
+      return Tensor.full((1,), start, **kwargs)
+    step_size = (stop - start) / (steps - 1)
+    return Tensor.full((steps,), start, **kwargs) + Tensor.arange(steps, **kwargs) * step_size
+
+  @staticmethod
   def eye(dim:int, **kwargs): return Tensor.full((dim,1),1,**kwargs).pad(((0,0),(0,dim))).reshape(dim*(dim+1)).shrink(((0,dim*dim),)).reshape(dim, dim)
 
   def full_like(self, fill_value, **kwargs): return Tensor.full(self.shape, fill_value=fill_value, dtype=kwargs.pop("dtype", self.dtype), device=kwargs.pop("device", self.device), **kwargs)
